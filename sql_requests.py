@@ -15,4 +15,4 @@ SQL_CREATION_TABLE = """
 SQL_AJOUTER_PRIX = "INSERT INTO european_weather (date_heure, city, meteo) VALUES (?, ?, ?)"
 
 #Lecture des données
-SQL_LECTURE = "SELECT * FROM european_weather ORDER BY city, id DESC"
+SQL_LECTURE = "SELECT * FROM european_weather ORDER BY city, id ASC"

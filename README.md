@@ -4,3 +4,6 @@ information according to date and time.
 
 Second commit:
 Modifying the project to stock European cities weather information.
+
+Third commit:
+Correction of the lecture sql querry (DESC -> ASC)
