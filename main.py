@@ -14,25 +14,27 @@ def main():
     cursor.execute(SQL_CREATION_TABLE) #Execute ce qu'il y'a dans cette variable
     conn.commit() #sauvegarde
 
-    #Appel API
-    print(f"\nRécupération de la météo...")
-    response = requests.get(URL_API) #On place dans la variable ce que l'API nous renvoie
+    for city in cities_list:
+        #Appel API
+        print(f"\nRécupération de la météo de la ville de {city}")
+        completed_url_api = f"{URL_API}{city}"
+        response = requests.get(completed_url_api) #On place dans la variable ce que l'API nous renvoie
 
-    if response.status_code == 200: #Si l'appel API a bien fonctionné
-        data = response.json()  #On traduis la réponse et on la place dans data
-        meteo = data['temperature'] #Je récupère ce qu'il y'a dans la clé température de la réponse data
-        print(f"Météo actuelle : {meteo}")
+        if response.status_code == 200: #Si l'appel API a bien fonctionné
+            data = response.json()  #On traduis la réponse et on la place dans data
+            meteo = data['temperature'] #Je récupère ce qu'il y'a dans la clé température de la réponse data
+            print(f"Météo actuelle de {city} : {meteo}")
 
-    else:
-        print('Problème API')
-        meteo = "Erreur API"
+        else:
+            print('Problème API')
+            meteo = "Erreur API"
 
-    date_now = datetime.datetime.now().strftime("%d/%m/%Y %H:%M") #On récupère la date et l'heure actuelle sous ce format
-    cursor.execute(SQL_AJOUTER_PRIX, (date_now, meteo)) #On execute la requete SQL en remplaclant (?, ?) par ceci
-    conn.commit() #sauvegarde
+        date_now = datetime.datetime.now().strftime("%d/%m/%Y %H:%M") #On récupère la date et l'heure actuelle sous ce format
+        cursor.execute(SQL_AJOUTER_PRIX, (date_now, city, meteo)) #On execute la requete SQL en remplaclant (?, ?) par ceci
+        conn.commit() #sauvegarde
 
-    if meteo != "Erreur API":
-        print(f'Météo sauvegardée dans {DB_name} !')
+        if meteo != "Erreur API":
+            print(f'Météo de {city} sauvegardée dans {DB_name} !')
 
     historique = input("\nVoulez vous consulter l'historique actuel [Y] ? ")
 
@@ -41,11 +43,10 @@ def main():
         cursor.execute(SQL_LECTURE) #Execute la requete SQL qui affiche chaque ligne de la base de donnée
 
         for ligne in cursor.fetchall(): #Pour chaque ligne cela va afficher de la manière suivante
-            print(f"Date: {ligne[1]} | Weather: {ligne[2]}") # [1] correspond à la date et [2] à la meteo ([0] correspond à id)
+            print(f"Date: {ligne[1]} | City: {ligne[2]} | Weather: {ligne[3]}") # [1] correspond à la date et [2] à la meteo ([0] correspond à id)
         conn.close()
 
     print("\nFin de l'éxécution")
-
 
 #Cette condition permet de lancer le script proprement
 if __name__ == "__main__":
